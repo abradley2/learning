@@ -75,7 +75,7 @@ func (s *APIServer) handleGetAccounts(w http.ResponseWriter, r *http.Request) er
 	return WriteJSON(w, http.StatusOK, accounts)
 }
 
-// single
+// detail
 func (s *APIServer) handleGetAccount(w http.ResponseWriter, r *http.Request) error {
 	// doesn't error if no id provided, just empty string
 	ID := mux.Vars(r)["id"]
