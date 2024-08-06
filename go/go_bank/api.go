@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 )
 
@@ -70,10 +71,11 @@ func (s *APIServer) handleAccount(w http.ResponseWriter, r *http.Request) error 
 
 // list
 func (s *APIServer) handleGetAccounts(w http.ResponseWriter, r *http.Request) error {
-	account := NewAccount("Money", "Bags")
-	account1 := NewAccount("Money", "Penny")
-	account2 := NewAccount("James", "Bond")
-	accounts := []*Account{account, account1, account2}
+	// account := NewAccount("Money", "Bags")
+	// account1 := NewAccount("Money", "Penny")
+	// account2 := NewAccount("James", "Bond")
+	// accounts := []*Account{account, account1, account2}
+	accounts := []*Account{}
 	return WriteJSON(w, http.StatusOK, accounts)
 }
 
@@ -86,8 +88,32 @@ func (s *APIServer) handleGetAccount(w http.ResponseWriter, r *http.Request) err
 	return WriteJSON(w, http.StatusOK, account)
 }
 
+type CreateAccountRequestBody struct {
+	FirstName     string    `json:"firstName"`
+	LastName      string    `json:"lastName"`
+	AccountNumber uuid.UUID `json:"accountNumber"`
+	Balance       int64     `json:"balance"`
+}
+
 func (s *APIServer) handleCreateAccount(w http.ResponseWriter, r *http.Request) error {
-	return nil
+	req := new(CreateAccountRequestBody)
+
+	// this needs to parse the JSON from the body
+	if err := json.NewDecoder(r.Body).Decode(req); err != nil {
+		return err
+	}
+
+	lastFour := req.AccountNumber.String()[len(req.AccountNumber.String())-4:]
+
+	log.Println("Creating account from:",
+		req.FirstName,
+		req.LastName,
+		lastFour)
+
+	// created a struct that the create account accepts
+	// call the create account with that struct
+
+	return WriteJSON(w, http.StatusOK, req)
 }
 
 func (s *APIServer) handleDeleteAccount(w http.ResponseWriter, r *http.Request) error {

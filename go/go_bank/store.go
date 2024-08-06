@@ -2,11 +2,13 @@ package main
 
 import (
 	"database/sql"
+	"fmt"
+
 	_ "github.com/lib/pq"
 )
 
 type Storage interface {
-	CreateAccount(*Account) error
+	CreateAccount(*Account) (*Account, error)
 	GetAccount(int) (*Account, error)
 	UpdateAccount(*Account) error
 	DeleteAccount(int) error
@@ -59,8 +61,23 @@ func (s *PostgresStore) createAccountTable() error {
 }
 
 // endregion
-func (s *PostgresStore) CreateAccount(*Account) error {
-	return nil
+func (s *PostgresStore) CreateAccount(acc *Account) (*Account, error) {
+	query := `
+    INSERT INTO account (
+        first_name,
+        last_name,
+        account_number,
+        balance,
+    ) VALUES ($1, $2, $3, $4)
+    RETURNING id, first_name, last_name, account_number, balance, created_at, updated_at
+    `
+	row, err := s.db.Exec(query, acc.FirstName, acc.LastName, acc.AccountNumber, acc.Balance)
+
+	if err != nil {
+		return nil, err
+	}
+	fmt.Print(row)
+	return nil, nil
 }
 func (s *PostgresStore) GetAccount(int) (*Account, error) {
 	return nil, nil
