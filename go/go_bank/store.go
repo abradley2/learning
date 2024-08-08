@@ -8,7 +8,7 @@ import (
 )
 
 type Storage interface {
-	CreateAccount(*Account) (*Account, error)
+	CreateAccount(*CreateAccountAccount) (*Account, error)
 	GetAccount(int) (*Account, error)
 	UpdateAccount(*Account) error
 	DeleteAccount(int) error
@@ -61,23 +61,48 @@ func (s *PostgresStore) createAccountTable() error {
 }
 
 // endregion
-func (s *PostgresStore) CreateAccount(acc *Account) (*Account, error) {
+// pg helpers region
+func scanRowIntoAccount(row *sql.Rows) (*Account, error) {
+	account := new(Account)
+	// must be in the same order as the columns in the database
+	err := row.Scan(
+		&account.ID,
+		&account.FirstName,
+		&account.LastName,
+		&account.AccountNumber,
+		&account.Balance,
+		&account.CreatedAt,
+		&account.UpdatedAt,
+	)
+
+	if err != nil {
+		return nil, err
+	}
+	return account, err
+}
+
+// endregion
+func (s *PostgresStore) CreateAccount(acc *CreateAccountAccount) (*Account, error) {
 	query := `
     INSERT INTO account (
         first_name,
         last_name,
         account_number,
-        balance,
+        balance
     ) VALUES ($1, $2, $3, $4)
     RETURNING id, first_name, last_name, account_number, balance, created_at, updated_at
     `
-	row, err := s.db.Exec(query, acc.FirstName, acc.LastName, acc.AccountNumber, acc.Balance)
+	rows, err := s.db.Query(query, acc.FirstName, acc.LastName, acc.AccountNumber, acc.Balance)
 
 	if err != nil {
 		return nil, err
 	}
-	fmt.Print(row)
-	return nil, nil
+
+	for rows.Next() {
+		return scanRowIntoAccount(rows)
+	}
+
+	return nil, fmt.Errorf("Failed to create an account")
 }
 func (s *PostgresStore) GetAccount(int) (*Account, error) {
 	return nil, nil

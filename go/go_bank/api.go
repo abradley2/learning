@@ -111,9 +111,19 @@ func (s *APIServer) handleCreateAccount(w http.ResponseWriter, r *http.Request) 
 		lastFour)
 
 	// created a struct that the create account accepts
-	// call the create account with that struct
+	account := new(CreateAccountAccount)
+	account.AccountNumber = req.AccountNumber
+	account.FirstName = req.FirstName
+	account.LastName = req.LastName
 
-	return WriteJSON(w, http.StatusOK, req)
+	// call the create account with that struct
+	acc, err := s.store.CreateAccount(account)
+
+	if err != nil {
+		return err
+	}
+
+	return WriteJSON(w, http.StatusCreated, acc)
 }
 
 func (s *APIServer) handleDeleteAccount(w http.ResponseWriter, r *http.Request) error {
