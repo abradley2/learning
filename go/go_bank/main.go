@@ -1,11 +1,13 @@
 package main
 
 import (
+	"github.com/wley3337/learning/tree/main/go/go_bank/internals/api"
+	st "github.com/wley3337/learning/tree/main/go/go_bank/internals/store"
 	"log"
 )
 
 func main() {
-	store, err := NewPostgresStore()
+	store, err := st.NewPostgresStore()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -14,6 +16,6 @@ func main() {
 		log.Fatal(err)
 	}
 
-	server := NewAPIServer(":3000", store)
+	server := api.NewAPIServer(":3000", store)
 	server.Run()
 }
