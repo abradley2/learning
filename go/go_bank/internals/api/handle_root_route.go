@@ -1,7 +1,7 @@
 package api
 
 import (
-	t "github.com/wley3337/learning/tree/main/go/go_bank/internals/types"
+	t "github.com/wley3337/learning/tree/main/go/go_bank/types"
 
 	"encoding/json"
 	"fmt"

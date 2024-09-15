@@ -2,7 +2,7 @@ package store
 
 import (
 	"database/sql"
-	t "github.com/wley3337/learning/tree/main/go/go_bank/internals/types"
+	t "github.com/wley3337/learning/tree/main/go/go_bank/types"
 
 	_ "github.com/lib/pq"
 )
