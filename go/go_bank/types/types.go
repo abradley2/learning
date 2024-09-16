@@ -1,6 +1,7 @@
 package types
 
 import (
+	"database/sql"
 	"time"
 
 	"github.com/google/uuid"
@@ -23,6 +24,19 @@ type Account struct {
 	Balance       int64     `json:"balance"`
 	CreatedAt     time.Time `json:"createdAt"`
 	UpdatedAt     time.Time `json:"updatedAt"`
+}
+
+func (account *Account) FromRow(row *sql.Rows) error {
+	// must be in the same order as the columns in the database
+	return row.Scan(
+		&account.ID,
+		&account.FirstName,
+		&account.LastName,
+		&account.AccountNumber,
+		&account.Balance,
+		&account.CreatedAt,
+		&account.UpdatedAt,
+	)
 }
 
 func NewAccount(firstName, lastName string) *Account {
